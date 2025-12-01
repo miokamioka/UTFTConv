@@ -23,7 +23,7 @@ namespace UTFTConv
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Filter = "画像ファイル(*.bmp;*.jpg;*.png;*.jpeg)|*.bmp;*.jpg;*.png;*.jpeg|すべてのファイル(*.*)|*.*";
+                ofd.Filter = "image file(*.bmp;*.jpg;*.png;*.jpeg)|*.bmp;*.jpg;*.png;*.jpeg";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     using (FileStream fs = new FileStream(ofd.FileName, FileMode.Open, FileAccess.Read))
