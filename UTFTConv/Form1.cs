@@ -111,9 +111,15 @@ namespace UTFTConv
         {
             StringBuilder sb = new StringBuilder();
 
-            // hedder
+            // header
             sb.AppendLine($"// Image Size: {bmp.Width}x{bmp.Height}");
-            sb.AppendLine("#include <avr/pgmspace.h>");
+            sb.AppendLine("#if defined(__AVR__)");
+            sb.AppendLine("     #include <avr/pgmspace.h>");
+            sb.AppendLine("#elif defined(__PIC32MX__)");
+            sb.AppendLine("     #define PROGMEM");
+            sb.AppendLine("#elif defined(__arm__)");
+            sb.AppendLine("     #define PROGMEM");
+            sb.AppendLine("#endif");
             sb.AppendLine();
             sb.AppendLine($"const unsigned short {arrayName}[{bmp.Width * bmp.Height}] PROGMEM = {{");
 

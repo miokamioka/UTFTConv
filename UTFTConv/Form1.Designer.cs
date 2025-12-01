@@ -40,9 +40,8 @@
             this.lblStatus.AutoSize = true;
             this.lblStatus.Location = new System.Drawing.Point(321, 313);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(43, 15);
+            this.lblStatus.Size = new System.Drawing.Size(0, 15);
             this.lblStatus.TabIndex = 0;
-            this.lblStatus.Text = "label1";
             this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnLoad
