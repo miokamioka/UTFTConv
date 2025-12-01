@@ -17,21 +17,72 @@ namespace UTFTConv
         public Form1()
         {
             InitializeComponent();
+            this.AllowDrop = true;
+            this.DragEnter += Form1_DragEnter;
+            this.DragDrop += Form1_DragDrop;
         }
 
+
+
+        private void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void Form1_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            if (files != null && files.Length > 0)
+            {
+                string filePath = files[0];
+
+                string ext = Path.GetExtension(filePath).ToLower();
+                if (ext == ".bmp" || ext == ".jpg" || ext == ".jpeg" || ext == ".png")
+                {
+                    LoadImageFromFile(filePath);
+                }
+                else
+                {
+                    MessageBox.Show("This file is not supported.");
+                }
+            }
+        }
+
+        private void LoadImageFromFile(string filePath)
+        {
+            try
+            {
+                if (_currentBitmap != null) _currentBitmap.Dispose();
+
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    _currentBitmap = new Bitmap(fs);
+                }
+
+                pictureBox1.Image = _currentBitmap;
+                lblStatus.Text = $"Loaded: {_currentBitmap.Width}x{_currentBitmap.Height} ({Path.GetFileName(filePath)})";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load the image.\n{ex.Message}");
+            }
+        }
         private void btnLoad_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Filter = "image file(*.bmp;*.jpg;*.png;*.jpeg)|*.bmp;*.jpg;*.png;*.jpeg";
+                ofd.Filter = "Image Files(*.bmp;*.jpg;*.png;*.jpeg)|*.bmp;*.jpg;*.png;*.jpeg";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    using (FileStream fs = new FileStream(ofd.FileName, FileMode.Open, FileAccess.Read))
-                    {
-                        _currentBitmap = new Bitmap(fs);
-                    }
-                    pictureBox1.Image = _currentBitmap;
-                    lblStatus.Text = $"Loaded: {_currentBitmap.Width}x{_currentBitmap.Height}";
+                    LoadImageFromFile(ofd.FileName);
                 }
             }
         }
@@ -43,15 +94,15 @@ namespace UTFTConv
             using (SaveFileDialog sfd = new SaveFileDialog())
             {
                 sfd.Filter = "C Source File|*.c";
-                sfd.FileName = "image_data.c";
+                sfd.FileName = "image.c";
 
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
-                    string arrayName = Path.GetFileNameWithoutExtension(sfd.FileName);
+                    string arrayName = Path.GetFileNameWithoutExtension(sfd.FileName).Replace(" ", "_").Replace("-", "_");
+
                     string cContent = GenerateCFileContent(_currentBitmap, arrayName);
 
                     File.WriteAllText(sfd.FileName, cContent);
-                    lblStatus.Text = $"Saved: {sfd.FileName}";
                     MessageBox.Show("done.");
                 }
             }
